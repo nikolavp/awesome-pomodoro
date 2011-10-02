@@ -3,10 +3,9 @@
 ## Usage
 
     cd ~/.config/awesome
-    git clone git://github.com/francois2metz/pomodoro-awesome.git pomodoro
+    git clone git://github.com/nikolavp/awesome-pomodoro.git pomodoro
 
 ### In you rc.lua:
-
 
     // insert after beautiful.init("...")
     local pomodoro = require("pomodoro")
@@ -18,33 +17,35 @@
     //init the pomodoro object with the current customizations
     pomodoro.init()
 
-    At this point there are two widget you will want to use in your wibox:
+At this point there are two widget you will want to use in your wibox:
 
 *    pomodoro.widget - the main widget that will display the time of the current pomodoro.
 
 *    pomodoro.icon_widget - the icon that you can use to display close to the text.
 
-### Add it to your wibox:
+### Add it to your wibox
 
-    You can use 
+You can use:
+* only the text widget:
 
-*   only the text widget:
-    mywibox[s].widgets = {
-        pomodoro.widget,
-        mytextclock,
-    }
+        mywibox[s].widgets = {
+            pomodoro.widget,
+            mytextclock,
+        }
 
-*   only the icon widget:
-    mywibox[s].widgets = {
-        pomodoro.icon_widget,
-        mytextclock,
-    }
+* only the icon widget:
 
-*   or you can use them both:
-    mywibox[s].widgets = {
-        pomodoro,widget, pomodoro.icon_widget,
-        mytextclock,
-    }
+        mywibox[s].widgets = {
+            pomodoro.icon_widget,
+            mytextclock,
+        }
+
+* or you can use them both:
+
+        mywibox[s].widgets = {
+            pomodoro,widget, pomodoro.icon_widget,
+            mytextclock,
+        }
 
 ## Customization
 
