@@ -26,6 +26,7 @@ At this point there are two widget you will want to use in your wibox:
 ### Add it to your wibox
 
 You can use:
+
 * only the text widget:
 
         mywibox[s].widgets = {
@@ -54,7 +55,13 @@ If you want change the default icon, you can use beautiful:
     beautiful.pomodoro_icon = '/your/path/to/pomodoro/icon'
 
 Check out the init.lua too. For example if you don't want the text "Pomodoro:"
-before the actual timer issue pomodoro.pre_text = "" before calling pomodoro.init()
+before the actual timer issue 
+
+    pomodoro.pre_text = "" 
+
+before calling 
+
+    pomodoro.init()
 
 ## License
 
