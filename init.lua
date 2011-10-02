@@ -41,8 +41,8 @@ end
 
 function pomodoro:notify(title, text, duration, working)
   naughty.notify {
-    bg = "#ff0000",
-    fg = "#aaaaaa",
+    bg = beautiful.bg_urgent,
+    fg = beautiful.fg_urgent,
     title = title,
     text  = text,
     timeout = 10
