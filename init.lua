@@ -6,6 +6,7 @@ local naughty   = require("naughty")
 local beautiful = require("beautiful")
 local os        = os
 local string    = string
+local ipairs    = ipairs
 local setmetatable = setmetatable
 
 module("pomodoro")
@@ -24,11 +25,13 @@ pomodoro.pause_text = "Get back to work!"
 pomodoro.work_title = "Pomodoro finished."
 pomodoro.work_text = "Time for a pause!"
 pomodoro.working = true
-pomodoro.left = pomodoro.work_duration
 pomodoro.widget = widget({ type = "textbox" })
 pomodoro.icon_widget = widget({type="imagebox"})
-pomodoro.icon_widget.image = image(pomodoro_image_path)
 pomodoro.timer = timer { timeout = 1 }
+
+-- Callbacks to be called when the pomodoro finishes or the rest time finishes
+pomodoro.on_work_pomodoro_finish_callbacks = {}
+pomodoro.on_pause_pomodoro_finish_callbacks = {}
 
 function pomodoro:settime(t)
   if t >= 3600 then -- more than one hour!
@@ -53,9 +56,7 @@ function pomodoro:notify(title, text, duration, working)
   pomodoro.working = working
 end
 
-function pomodoro:init()
-    pomodoro:settime(pomodoro.work_duration)
-end
+
 
 function get_buttons()
   return awful.util.table.join(
@@ -74,42 +75,58 @@ function get_buttons()
     )
 end
 
-pomodoro.widget:buttons(get_buttons())
-pomodoro.icon_widget:buttons(get_buttons())
 
-pomodoro_tooltip = awful.tooltip({
-                                    objects = { pomodoro.widget, pomodoro.icon_widget},
-                                    timer_function = function()
-                                        if pomodoro.timer.started then
-                                            if pomodoro.working then
-                                                return 'Work ending in ' .. os.date("%M:%S", pomodoro.left)
-                                            else
-                                                return 'Rest ending in ' .. os.date("%M:%S", pomodoro.left)
-                                            end
-                                        else
-                                            return 'Pomodoro not started'
-                                        end
-                                        return 'Bad tooltip'
-                                    end,
-})
+function pomodoro:init()
+    -- Initial values that depend on the values that can be set by the user
+    pomodoro.left = pomodoro.work_duration
+    pomodoro.icon_widget.image = image(pomodoro_image_path)
+    -- Timer configuration
+    --
+    pomodoro.timer:add_signal("timeout", function()
+        local now = os.time()
+        pomodoro.left = pomodoro.left - (now - pomodoro.last_time)
+        pomodoro.last_time = now
 
-pomodoro.timer:add_signal("timeout", function()
-  local now = os.time()
-  pomodoro.left = pomodoro.left - (now - pomodoro.last_time)
-  pomodoro.last_time = now
+        if pomodoro.left > 0 then
+            pomodoro:settime(pomodoro.left)
+        else
+            if pomodoro.working then
+                pomodoro:notify(pomodoro.work_title, pomodoro.work_text,
+                pomodoro.pause_duration, false)
+                for _, value in ipairs(pomodoro.on_work_pomodoro_finish_callbacks) do
+                    value()
+                end
+            else
+                pomodoro:notify(pomodoro.pause_title, pomodoro.pause_text,
+                pomodoro.work_duration, true)
+                for _, value in ipairs(pomodoro.on_pause_pomodoro_finish_callbacks) do
+                    value()
+                end
+            end
+            pomodoro.timer:stop()
+        end
+    end)
 
-  if pomodoro.left > 0 then
-    pomodoro:settime(pomodoro.left)
-  else
-    if pomodoro.working then
-      pomodoro:notify(pomodoro.work_title, pomodoro.work_text,
-        pomodoro.pause_duration, false)
-    else
-      pomodoro:notify(pomodoro.pause_title, pomodoro.pause_text,
-        pomodoro.work_duration, true)
-    end
-    pomodoro.timer:stop()
-  end
-end)
+    pomodoro:settime(pomodoro.work_duration)
+    pomodoro.widget:buttons(get_buttons())
+    pomodoro.icon_widget:buttons(get_buttons())
+
+    awful.tooltip({
+        objects = { pomodoro.widget, pomodoro.icon_widget},
+        timer_function = function()
+            if pomodoro.timer.started then
+                if pomodoro.working then
+                    return 'Work ending in ' .. os.date("%M:%S", pomodoro.left)
+                else
+                    return 'Rest ending in ' .. os.date("%M:%S", pomodoro.left)
+                end
+            else
+                return 'Pomodoro not started'
+            end
+            return 'Bad tooltip'
+        end,
+    })
+
+end
 
 return pomodoro

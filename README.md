@@ -48,20 +48,40 @@ You can use:
             mytextclock,
         }
 
-## Customization
+## Customizations
 
-If you want change the default icon, you can use beautiful:
+customizations are done by setting variables under the pomodoro table. Note that those should be done before calling
+
+    pomodoro.init()
+
+### Change the default icon
+For that you can use the following which requires beautiful:
 
     beautiful.pomodoro_icon = '/your/path/to/pomodoro/icon'
 
-Check out the init.lua too. For example if you don't want the text "Pomodoro:"
-before the actual timer issue 
+### Check out the init.lua too. For example if you don't want the text "Pomodoro:"
 
     pomodoro.pre_text = "" 
 
-before calling 
+#### Execute a custom function on pomodoro finish
 
-    pomodoro.init()
+You can populate the tables:
+
+*pomodoro.on_work_pomodoro_finish_callbacks* and *pomodoro.on_pause_pomodoro_finish_callbacks*
+
+with functions to be called when the pomodoro finishes. on_pause_pomodoro_finish_callbacks functions will be called when a pause finishes and on_work_pomodoro_finish_callbacks functions are called when a pomodoro finishes.
+
+Here is an example how I am using this to lock my screen on every pomodoro finish:
+
+    pomodoro.on_work_pomodoro_finish_callbacks = {
+        function()
+            exec('slock')
+        end
+    }
+
+#### More customizations
+
+Maybe there are more which are not documented here at the moment. Feel free to provide docs and send a pull request :)
 
 ## License
 
