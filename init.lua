@@ -1,4 +1,4 @@
-local widget    = widget
+local wibox     = require("wibox")
 local image     = image
 local timer     = timer
 local awful     = require("awful")
@@ -25,8 +25,8 @@ pomodoro.pause_text = "Get back to work!"
 pomodoro.work_title = "Pomodoro finished."
 pomodoro.work_text = "Time for a pause!"
 pomodoro.working = true
-pomodoro.widget = widget({ type = "textbox" })
-pomodoro.icon_widget = widget({type="imagebox"})
+pomodoro.widget = wibox.widget.textbox()
+pomodoro.icon_widget = wibox.widget.imagebox()
 pomodoro.timer = timer { timeout = 1 }
 
 -- Callbacks to be called when the pomodoro finishes or the rest time finishes
@@ -39,7 +39,7 @@ function pomodoro:settime(t)
   else
     t = os.date("%M:%S", t)
   end
-  self.widget.text = pomodoro.pre_text .. "<b>" .. t .. "</b>"
+  self.widget:set_markup(pomodoro.pre_text .. "<b>" .. t .. "</b>")
 end
 
 function pomodoro:notify(title, text, duration, working)
@@ -79,10 +79,10 @@ end
 function pomodoro:init()
     -- Initial values that depend on the values that can be set by the user
     pomodoro.left = pomodoro.work_duration
-    pomodoro.icon_widget.image = image(pomodoro_image_path)
+    pomodoro.icon_widget:set_image(pomodoro_image_path)
     -- Timer configuration
     --
-    pomodoro.timer:add_signal("timeout", function()
+    pomodoro.timer:connect_signal("timeout", function()
         local now = os.time()
         pomodoro.left = pomodoro.left - (now - pomodoro.last_time)
         pomodoro.last_time = now
