@@ -71,7 +71,20 @@ function get_buttons()
       pomodoro.timer:stop()
       pomodoro.left = pomodoro.work_duration
       pomodoro:settime(pomodoro.work_duration)
-    end)
+    end),
+    awful.button({ }, 4, function()                                                
+      pomodoro.timer:stop()                                                        
+      pomodoro:settime(pomodoro.work_duration+60)                                  
+      pomodoro.work_duration = pomodoro.work_duration+60                           
+      pomodoro.left = pomodoro.work_duration                                       
+    end),                                                                          
+    awful.button({ }, 5, function()                                                
+    pomodoro.timer:stop()                                                          
+    if pomodoro.work_duration > 60 then                                            
+        pomodoro:settime(pomodoro.work_duration-60)                                
+        pomodoro.work_duration = pomodoro.work_duration-60                         
+        pomodoro.left = pomodoro.work_duration                                     
+    end
     )
 end
 
