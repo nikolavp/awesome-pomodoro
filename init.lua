@@ -16,6 +16,7 @@ pomodoro = {}
 -- tweak these values in seconds to your liking
 pomodoro.pause_duration = 5 * 60
 pomodoro.work_duration = 25 * 60
+pomodoro.change = 60
 
 local pomodoro_image_path = beautiful.pomodoro_icon or awful.util.getdir("config") .."/pomodoro/pomodoro.png"
 
@@ -72,20 +73,20 @@ function get_buttons()
       pomodoro.left = pomodoro.work_duration
       pomodoro:settime(pomodoro.work_duration)
     end),
-    awful.button({ }, 4, function()                                                
-      pomodoro.timer:stop()                                                        
-      pomodoro:settime(pomodoro.work_duration+60)                                  
-      pomodoro.work_duration = pomodoro.work_duration+60                           
-      pomodoro.left = pomodoro.work_duration                                       
-    end),                                                                          
-    awful.button({ }, 5, function()                                                
-    pomodoro.timer:stop()                                                          
-    if pomodoro.work_duration > 60 then                                            
-        pomodoro:settime(pomodoro.work_duration-60)                                
-        pomodoro.work_duration = pomodoro.work_duration-60                         
-        pomodoro.left = pomodoro.work_duration                                     
-    end
-    )
+    awful.button({ }, 4, function()
+      pomodoro.timer:stop()
+      pomodoro:settime(pomodoro.work_duration+pomodoro.change)
+      pomodoro.work_duration = pomodoro.work_duration+pomodoro.change
+      pomodoro.left = pomodoro.work_duration
+    end),
+    awful.button({ }, 5, function()
+    pomodoro.timer:stop()
+    if pomodoro.work_duration > pomodoro.change then
+        pomodoro:settime(pomodoro.work_duration-pomodoro.change)
+        pomodoro.work_duration = pomodoro.work_duration-pomodoro.change
+        pomodoro.left = pomodoro.work_duration
+    end)
+  )
 end
 
 
