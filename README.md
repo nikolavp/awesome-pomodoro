@@ -79,6 +79,12 @@ Here is an example how I am using this to lock my screen on every pomodoro finis
         end
     }
 
+#### Up/Down time with the mouse wheel
+
+You can _up or down the time_ with the mouse wheel if you put your mouse on widget. By default, you
+can up or down it minute by minute, but if you want you can change it. In init.lua, change the
+variable _pomodoro.change_ to seconds that you want.
+
 #### More customizations
 
 Maybe there are more which are not documented here at the moment. Feel free to provide docs and send a pull request :)
