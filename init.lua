@@ -20,7 +20,7 @@ pomodoro.change = 60
 
 local pomodoro_image_path = beautiful.pomodoro_icon or awful.util.getdir("config") .."/pomodoro/pomodoro.png"
 
-pomodoro.pre_text = "Pomodoro: "
+pomodoro.format = function (t) return "Pomodoro: <b>" .. t .. "</b>" end
 pomodoro.pause_title = "Pause finished."
 pomodoro.pause_text = "Get back to work!"
 pomodoro.work_title = "Pomodoro finished."
@@ -40,7 +40,7 @@ function pomodoro:settime(t)
   else
     t = os.date("%M:%S", t)
   end
-  self.widget:set_markup(pomodoro.pre_text .. "<b>" .. t .. "</b>")
+  self.widget:set_markup(pomodoro.format(t))
 end
 
 function pomodoro:notify(title, text, duration, working)

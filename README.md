@@ -59,9 +59,15 @@ For that you can use the following which requires beautiful:
 
     beautiful.pomodoro_icon = '/your/path/to/pomodoro/icon'
 
-### Check out the init.lua too. For example if you don't want the text "Pomodoro:"
+### Check out the init.lua too.
 
-    pomodoro.pre_text = "" 
+For example if you don't want the text "Pomodoro:"
+
+    pomodoro.format = function (t) return t end
+
+or want time left to be show in bold:
+
+    pomodoro.format = function (t) return "[ <b>" .. t .. "</b> ]") end
 
 #### Execute a custom function on pomodoro finish
 
