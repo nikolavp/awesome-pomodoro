@@ -44,7 +44,7 @@ You can use:
 * or you can use them both:
 
         mywibox[s].widgets = {
-            pomodoro,widget, pomodoro.icon_widget,
+            pomodoro.widget, pomodoro.icon_widget,
             mytextclock,
         }
 
