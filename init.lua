@@ -36,7 +36,7 @@ pomodoro.on_pause_pomodoro_finish_callbacks = {}
 
 function pomodoro:settime(t)
   if t >= 3600 then -- more than one hour!
-    t = os.date("%X", t-3600)
+    t = os.date("!%X", t)
   else
     t = os.date("%M:%S", t)
   end
