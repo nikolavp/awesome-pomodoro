@@ -91,6 +91,23 @@ You can _up or down the time_ with the mouse wheel if you put your mouse on widg
 can up or down it minute by minute, but if you want you can change it. In init.lua, change the
 variable _pomodoro.change_ to seconds that you want.
 
+#### Bind different interactions to a key
+
+If you don't want to use the mouse to interact with the widget you can easily bind custom keys to different actions/functions:
+
+* pomodoro:start to start a pomodoro
+* pomodoro:stop to stop a current pomodoro
+* pomodoro:pause to pause the current pomodoro
+* pomodoro:increase_time to increase the time of the pomodoro
+* pomodoro:decrease_time to decrease the time of the pomodoro
+
+so let's say you want to start a new pomodoro with *Modkey + Shift + p* then just include the following in your rc.lua file
+
+```lua
+awful.key({ modkey, "Shift" }, "p",  function() pomodoro:start() end)
+```
+in your global keybinding section
+
 #### More customizations
 
 Maybe there are more which are not documented here at the moment. Feel free to provide docs and send a pull request :)
