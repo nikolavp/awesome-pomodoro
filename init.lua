@@ -57,35 +57,54 @@ function pomodoro:notify(title, text, duration, working)
   pomodoro.working = working
 end
 
+function pomodoro:start()
+      pomodoro.last_time = os.time()
+      pomodoro.timer:start()
+end
 
+function pomodoro:stop()
+    pomodoro.timer:stop()
+end
+
+function pomodoro:pause()
+    -- TODO: Fix the showed remaining text
+    pomodoro.timer:stop()
+    pomodoro.left = pomodoro.work_duration
+    pomodoro:settime(pomodoro.work_duration)
+end
+
+function pomodoro:increase_time()
+    pomodoro.timer:stop()
+    pomodoro:settime(pomodoro.work_duration+pomodoro.change)
+    pomodoro.work_duration = pomodoro.work_duration+pomodoro.change
+    pomodoro.left = pomodoro.work_duration
+end
+
+function pomodoro:decrease_time()
+    pomodoro.timer:stop()
+    if pomodoro.work_duration > pomodoro.change then
+        pomodoro:settime(pomodoro.work_duration-pomodoro.change)
+        pomodoro.work_duration = pomodoro.work_duration-pomodoro.change
+        pomodoro.left = pomodoro.work_duration
+    end
+end
 
 function get_buttons()
   return awful.util.table.join(
     awful.button({ }, 1, function()
-      pomodoro.last_time = os.time()
-      pomodoro.timer:start()
+        pomodoro:start()
     end),
     awful.button({ }, 2, function()
-      pomodoro.timer:stop()
+        pomodoro:stop()
     end),
     awful.button({ }, 3, function()
-      pomodoro.timer:stop()
-      pomodoro.left = pomodoro.work_duration
-      pomodoro:settime(pomodoro.work_duration)
+        pomodoro:pause()
     end),
     awful.button({ }, 4, function()
-      pomodoro.timer:stop()
-      pomodoro:settime(pomodoro.work_duration+pomodoro.change)
-      pomodoro.work_duration = pomodoro.work_duration+pomodoro.change
-      pomodoro.left = pomodoro.work_duration
+        pomodoro:increase_time()
     end),
     awful.button({ }, 5, function()
-        pomodoro.timer:stop()
-        if pomodoro.work_duration > pomodoro.change then
-            pomodoro:settime(pomodoro.work_duration-pomodoro.change)
-            pomodoro.work_duration = pomodoro.work_duration-pomodoro.change
-            pomodoro.left = pomodoro.work_duration
-        end
+        pomodoro:decrease_time()
     end)
   )
 end
