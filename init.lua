@@ -29,12 +29,17 @@ pomodoro.working = true
 pomodoro.widget = wibox.widget.textbox()
 pomodoro.icon_widget = wibox.widget.imagebox()
 pomodoro.timer = timer { timeout = 1 }
+pomodoro.keep_state = false
 
 -- Callbacks to be called when the pomodoro finishes or the rest time finishes
 pomodoro.on_work_pomodoro_finish_callbacks = {}
 pomodoro.on_pause_pomodoro_finish_callbacks = {}
 
 function pomodoro:settime(t)
+  if pomodoro.keep_state then
+      -- run this synchronously cause otherwise it is not saved properly -.-
+      awful.util.pread('echo "awesome.Pomodoro.time: ' .. t .. '" | xrdb -merge')
+  end
   if t >= 3600 then -- more than one hour!
     t = os.date("!%X", t)
   else
@@ -111,8 +116,11 @@ end
 
 
 function pomodoro:init()
-    -- Initial values that depend on the values that can be set by the user
-    pomodoro.left = pomodoro.work_duration
+    local resource_from_last_run = nil
+    if pomodoro.keep_state then
+        local xresources = awful.util.pread("xrdb -query")
+        resource_from_last_run = xresources:match('awesome.Pomodoro.time:%s+%d+')
+    end
     pomodoro.icon_widget:set_image(pomodoro_image_path)
     -- Timer configuration
     --
@@ -160,6 +168,14 @@ function pomodoro:init()
             return 'Bad tooltip'
         end,
     })
+
+    if resource_from_last_run then
+        pomodoro.left = resource_from_last_run:match('%d+')
+        pomodoro:start()
+    else
+        -- Initial value depends on the one set by the user
+        pomodoro.left = pomodoro.work_duration
+    end
 
 end
 
