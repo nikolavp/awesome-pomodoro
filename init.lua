@@ -8,6 +8,7 @@ local os        = os
 local string    = string
 local ipairs    = ipairs
 local setmetatable = setmetatable
+local awesome   = awesome
 
 module("pomodoro")
 
@@ -36,10 +37,6 @@ pomodoro.on_work_pomodoro_finish_callbacks = {}
 pomodoro.on_pause_pomodoro_finish_callbacks = {}
 
 function pomodoro:settime(t)
-  if pomodoro.keep_state then
-      -- run this synchronously cause otherwise it is not saved properly -.-
-      awful.util.pread('echo "awesome.Pomodoro.time: ' .. t .. '" | xrdb -merge')
-  end
   if t >= 3600 then -- more than one hour!
     t = os.date("!%X", t)
   else
@@ -148,6 +145,15 @@ function pomodoro:init()
             pomodoro.timer:stop()
         end
     end)
+
+    if pomodoro.keep_state then
+        awesome.connect_signal("exit", function(restarting)
+            -- run this synchronously cause otherwise it is not saved properly -.-
+            if restarting then
+                awful.util.pread('echo "awesome.Pomodoro.time: ' .. pomodoro.left .. '" | xrdb -merge')
+            end
+        end)
+    end
 
     pomodoro:settime(pomodoro.work_duration)
     pomodoro.widget:buttons(get_buttons())
