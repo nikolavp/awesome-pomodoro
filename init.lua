@@ -30,7 +30,6 @@ pomodoro.working = true
 pomodoro.widget = wibox.widget.textbox()
 pomodoro.icon_widget = wibox.widget.imagebox()
 pomodoro.timer = timer { timeout = 1 }
-pomodoro.keep_state = false
 
 -- Callbacks to be called when the pomodoro finishes or the rest time finishes
 pomodoro.on_work_pomodoro_finish_callbacks = {}
@@ -66,6 +65,7 @@ end
 
 function pomodoro:stop()
     pomodoro.timer:stop()
+    pomodoro.working = true
 end
 
 function pomodoro:pause()
@@ -114,10 +114,8 @@ end
 
 function pomodoro:init()
     local resource_from_last_run = nil
-    if pomodoro.keep_state then
-        local xresources = awful.util.pread("xrdb -query")
-        resource_from_last_run = xresources:match('awesome.Pomodoro.time:%s+%d+')
-    end
+    local xresources = awful.util.pread("xrdb -query")
+    resource_from_last_run = xresources:match('awesome.Pomodoro.time:%s+%d+')
     pomodoro.icon_widget:set_image(pomodoro_image_path)
     -- Timer configuration
     --
@@ -146,14 +144,12 @@ function pomodoro:init()
         end
     end)
 
-    if pomodoro.keep_state then
-        awesome.connect_signal("exit", function(restarting)
-            -- run this synchronously cause otherwise it is not saved properly -.-
-            if restarting then
-                awful.util.pread('echo "awesome.Pomodoro.time: ' .. pomodoro.left .. '" | xrdb -merge')
-            end
-        end)
-    end
+    awesome.connect_signal("exit", function(restarting)
+        -- run this synchronously cause otherwise it is not saved properly -.-
+        if restarting then
+            awful.util.pread('echo "awesome.Pomodoro.time: ' .. pomodoro.left .. '" | xrdb -merge')
+        end
+    end)
 
     pomodoro:settime(pomodoro.work_duration)
     pomodoro.widget:buttons(get_buttons())
