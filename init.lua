@@ -8,6 +8,7 @@ local os        = os
 local string    = string
 local ipairs    = ipairs
 local setmetatable = setmetatable
+local awesome   = awesome
 
 module("pomodoro")
 
@@ -64,6 +65,7 @@ end
 
 function pomodoro:stop()
     pomodoro.timer:stop()
+    pomodoro.working = true
 end
 
 function pomodoro:pause()
@@ -111,8 +113,9 @@ end
 
 
 function pomodoro:init()
-    -- Initial values that depend on the values that can be set by the user
-    pomodoro.left = pomodoro.work_duration
+    local resource_from_last_run = nil
+    local xresources = awful.util.pread("xrdb -query")
+    resource_from_last_run = xresources:match('awesome.Pomodoro.time:%s+%d+')
     pomodoro.icon_widget:set_image(pomodoro_image_path)
     -- Timer configuration
     --
@@ -141,6 +144,13 @@ function pomodoro:init()
         end
     end)
 
+    awesome.connect_signal("exit", function(restarting)
+        -- run this synchronously cause otherwise it is not saved properly -.-
+        if restarting then
+            awful.util.pread('echo "awesome.Pomodoro.time: ' .. pomodoro.left .. '" | xrdb -merge')
+        end
+    end)
+
     pomodoro:settime(pomodoro.work_duration)
     pomodoro.widget:buttons(get_buttons())
     pomodoro.icon_widget:buttons(get_buttons())
@@ -160,6 +170,14 @@ function pomodoro:init()
             return 'Bad tooltip'
         end,
     })
+
+    if resource_from_last_run then
+        pomodoro.left = resource_from_last_run:match('%d+')
+        pomodoro:start()
+    else
+        -- Initial value depends on the one set by the user
+        pomodoro.left = pomodoro.work_duration
+    end
 
 end
 
