@@ -173,6 +173,7 @@ describe('Should use the images properly', function()
     pomodoro.icon_widget.set_image = function(self, image_path) 
         path_we_got = image_path
     end
+    pomodoro.working = true
 
     it('should set the default icon to gray by default', function()
         pomodoro.init()
@@ -212,6 +213,16 @@ describe('Should use the images properly', function()
         pomodoro.left = 0
         pomodoro:ticking_time()
         assert.are.equal('/home/cooluser/.config/awesome/pomodoro/images/gray.png', path_we_got)
+    end)
+    it('shouldn\'t change the icon if we are currently not working', function()
+        pomodoro.working = false
+        pomodoro.work_duration = 30
+        interval_elements = {26, 16, 9}
+        for i, element in ipairs(interval_elements) do
+            pomodoro.left = element
+            pomodoro:ticking_time()
+            assert.are.equal('/home/cooluser/.config/awesome/pomodoro/images/green.png', path_we_got)
+        end
     end)
 end)
 

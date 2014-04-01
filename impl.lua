@@ -122,13 +122,17 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
 
     function pomodoro:ticking_time()
         if pomodoro.left > 0 then
-            local pomodoro_portion = pomodoro.work_duration / 3
-            if pomodoro.left > (2 * pomodoro_portion) then
-                set_pomodoro_icon('green')
-            elseif pomodoro.left > pomodoro_portion then
-                set_pomodoro_icon('orange')
+            if pomodoro.working then
+                local pomodoro_portion = pomodoro.work_duration / 3
+                if pomodoro.left > (2 * pomodoro_portion) then
+                    set_pomodoro_icon('green')
+                elseif pomodoro.left > pomodoro_portion then
+                    set_pomodoro_icon('orange')
+                else
+                    set_pomodoro_icon('red')
+                end
             else
-                set_pomodoro_icon('red')
+                set_pomodoro_icon('green')
             end
             pomodoro:settime(pomodoro.left)
         else
