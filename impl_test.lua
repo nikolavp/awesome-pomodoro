@@ -18,7 +18,7 @@ local wibox = {
 }
 local awful = {
     util = {
-        getdir = function(str) return '/home/cooluser/.config' end,
+        getdir = function(str) return '/home/cooluser/.config/awesome' end,
         pread = function(cmd) return "" end,
         table = {
             join = function(elements) return nil end
@@ -165,6 +165,53 @@ describe('Preserve the pomodoro before restart if any', function()
         pomodoro:init()
         assert.spy(s).was_not_called()
         assert.are.equal(1500, pomodoro.left)
+    end)
+end)
+
+describe('Should use the images properly', function()
+    path_we_got = nil
+    pomodoro.icon_widget.set_image = function(self, image_path) 
+        path_we_got = image_path
+    end
+
+    it('should set the default icon to gray by default', function()
+        pomodoro.init()
+        assert.are.equal('/home/cooluser/.config/awesome/pomodoro/images/gray.png', path_we_got)
+    end)
+
+    it('should set the image to the locked one when we pause a pomodoro', function()
+        pomodoro:pause()
+        assert.are.equal('/home/cooluser/.config/awesome/pomodoro/images/locked.png', path_we_got)
+    end)
+
+    it('should set the image to the gray one when we stop a pomodoro', function()
+        pomodoro:stop()
+        assert.are.equal('/home/cooluser/.config/awesome/pomodoro/images/gray.png', path_we_got)
+    end)
+
+    it('should change the image depending on the time that elapsed for the pomodoro', function()
+        -- there is more than 2/3 from the next break
+        pomodoro.left = 26
+        pomodoro.work_duration = 30
+        pomodoro:ticking_time()
+        assert.are.equal('/home/cooluser/.config/awesome/pomodoro/images/green.png', path_we_got)
+
+        -- there is more than 1/3 from the next break but smaller than 2/3
+        pomodoro.left = 16
+        pomodoro.work_duration = 30
+        pomodoro:ticking_time()
+        assert.are.equal('/home/cooluser/.config/awesome/pomodoro/images/orange.png', path_we_got)
+
+        pomodoro.left = 9
+        pomodoro.work_duration = 30
+        pomodoro:ticking_time()
+        assert.are.equal('/home/cooluser/.config/awesome/pomodoro/images/red.png', path_we_got)
+    end)
+
+    it('should set the icon back to gray when the pomodoro finishes', function()
+        pomodoro.left = 0
+        pomodoro:ticking_time()
+        assert.are.equal('/home/cooluser/.config/awesome/pomodoro/images/gray.png', path_we_got)
     end)
 end)
 

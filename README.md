@@ -54,11 +54,6 @@ customizations are done by setting variables under the pomodoro table. Note that
 
     pomodoro.init()
 
-### Change the default icon
-For that you can use the following which requires beautiful:
-
-    beautiful.pomodoro_icon = '/your/path/to/pomodoro/icon'
-
 ### Check out the init.lua too.
 
 For example if you don't want the text "Pomodoro:"

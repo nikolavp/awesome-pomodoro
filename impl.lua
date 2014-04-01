@@ -16,7 +16,6 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     pomodoro.work_duration = 25 * 60
     pomodoro.change = 60
 
-    local pomodoro_image_path = beautiful.pomodoro_icon or awful.util.getdir("config") .."/pomodoro/pomodoro.png"
 
     pomodoro.format = function (t) return "Pomodoro: <b>" .. t .. "</b>" end
     pomodoro.pause_title = "Pause finished."
@@ -31,6 +30,17 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     -- Callbacks to be called when the pomodoro finishes or the rest time finishes
     pomodoro.on_work_pomodoro_finish_callbacks = {}
     pomodoro.on_pause_pomodoro_finish_callbacks = {}
+
+    last_icon_used = nil
+
+    function set_pomodoro_icon(icon_name) 
+        local pomodoro_image_path = awful.util.getdir("config") .."/pomodoro/images/" .. icon_name .. ".png"
+        if last_icon_used == pomodoro_image_path then
+            return
+        end
+        last_icon_used = pomodoro_image_path
+        pomodoro.icon_widget:set_image(pomodoro_image_path)
+    end
 
     function pomodoro:settime(t)
         if t >= 3600 then -- more than one hour!
@@ -63,6 +73,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     function pomodoro:pause()
         -- TODO: Fix the showed remaining text
         pomodoro.timer:stop()
+        set_pomodoro_icon('locked')
     end
 
     function pomodoro:stop()
@@ -70,6 +81,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
         pomodoro.working = true
         pomodoro.left = pomodoro.work_duration
         pomodoro:settime(pomodoro.work_duration)
+        set_pomodoro_icon('gray')
     end
 
     function pomodoro:increase_time()
@@ -108,38 +120,54 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
         )
     end
 
+    function pomodoro:ticking_time()
+        if pomodoro.left > 0 then
+            local pomodoro_portion = pomodoro.work_duration / 3
+            if pomodoro.left > (2 * pomodoro_portion) then
+                set_pomodoro_icon('green')
+            elseif pomodoro.left > pomodoro_portion then
+                set_pomodoro_icon('orange')
+            else
+                set_pomodoro_icon('red')
+            end
+            pomodoro:settime(pomodoro.left)
+        else
+            set_pomodoro_icon('gray')
+            if pomodoro.working then
+                pomodoro:notify(pomodoro.work_title, pomodoro.work_text,
+                pomodoro.pause_duration, false)
+                for _, value in ipairs(pomodoro.on_work_pomodoro_finish_callbacks) do
+                    value()
+                end
+            else
+                pomodoro:notify(pomodoro.pause_title, pomodoro.pause_text,
+                pomodoro.work_duration, true)
+                for _, value in ipairs(pomodoro.on_pause_pomodoro_finish_callbacks) do
+                    value()
+                end
+            end
+            pomodoro.timer:stop()
+        end
+    end
+
+    -- Function that keeps the logic for ticking
+    function pomodoro:ticking()
+        local now = os.time()
+        pomodoro.left = pomodoro.left - (now - pomodoro.last_time)
+        pomodoro.last_time = now
+        pomodoro:ticking_time()
+    end
 
     function pomodoro:init()
         local resource_from_last_run = nil
         local xresources = awful.util.pread("xrdb -query")
         resource_from_last_run = xresources:match('awesome.Pomodoro.time:%s+%d+')
-        pomodoro.icon_widget:set_image(pomodoro_image_path)
+
+        set_pomodoro_icon('gray')
+
         -- Timer configuration
         --
-        pomodoro.timer:connect_signal("timeout", function()
-            local now = os.time()
-            pomodoro.left = pomodoro.left - (now - pomodoro.last_time)
-            pomodoro.last_time = now
-
-            if pomodoro.left > 0 then
-                pomodoro:settime(pomodoro.left)
-            else
-                if pomodoro.working then
-                    pomodoro:notify(pomodoro.work_title, pomodoro.work_text,
-                    pomodoro.pause_duration, false)
-                    for _, value in ipairs(pomodoro.on_work_pomodoro_finish_callbacks) do
-                        value()
-                    end
-                else
-                    pomodoro:notify(pomodoro.pause_title, pomodoro.pause_text,
-                    pomodoro.work_duration, true)
-                    for _, value in ipairs(pomodoro.on_pause_pomodoro_finish_callbacks) do
-                        value()
-                    end
-                end
-                pomodoro.timer:stop()
-            end
-        end)
+        pomodoro.timer:connect_signal("timeout", pomodoro.ticking)
 
         awesome.connect_signal("exit", function(restarting)
             -- run this synchronously cause otherwise it is not saved properly -.-
