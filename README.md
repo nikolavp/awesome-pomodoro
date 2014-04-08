@@ -1,6 +1,12 @@
 # Pomodoro Widget
 
-Before we start with the installation check out the [screenshots](https://github.com/nikolavp/awesome-pomodoro/wiki/Screenshots) to make sure that you really want this(of course you do)
+Here are some screenshots on what you'll get if you include this module:
+* <a href="http://imgur.com/ko2M5WQ"><img src="http://i.imgur.com/ko2M5WQ.png" title="Hosted by imgur.com"/></a>
+* <a href="http://imgur.com/j30ZilX"><img src="http://i.imgur.com/j30ZilX.png" title="Hosted by imgur.com" /></a>
+* <a href="http://imgur.com/V2IVWGO"><img src="http://i.imgur.com/V2IVWGO.png" title="Hosted by imgur.com"/></a> 
+* <a href="http://imgur.com/KZdC7Qw"><img src="http://i.imgur.com/KZdC7Qw.png" title="Hosted by imgur.com"/></a>
+
+more can be found in our [screenshots wiki page](https://github.com/nikolavp/awesome-pomodoro/wiki/Screenshots).
 
 ## Installation
 
