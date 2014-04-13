@@ -42,7 +42,7 @@ local timer = function(t)
 end
 
 local awesome = {
-        connect_signal = function(self, f) return nil end,
+    connect_signal = function(self, f) return nil end,
 }
 
 local pomodoro = createPomodoro(wibox, awful, naughty, beautiful, timer, awesome)
@@ -141,11 +141,12 @@ describe('Preserve the pomodoro before restart if any', function()
         pomodoro:init()
         assert.are.equal(716, pomodoro.left)
     end)
-    it('should start the pomodoro right away if the value is found in the database after a restart', function()
+    it('should start the pomodoro right away if the value is found in the database after a restart and it was started', function()
         local s = spy.on(pomodoro, 'start')
         awful.util.pread = function(s)
             return [[
             awesome.Pomodoro.time:  716
+            awesome.Pomodoro.started:  1
             XTerm*faceName: consolas
             xterm*.background:      grey5
             ]]
@@ -165,6 +166,21 @@ describe('Preserve the pomodoro before restart if any', function()
         pomodoro:init()
         assert.spy(s).was_not_called()
         assert.are.equal(1500, pomodoro.left)
+    end)
+
+    it('should not start the timer if it was paused or stopped', function()
+        local s = spy.on(pomodoro, 'start')
+        awful.util.pread = function(s)
+            return [[
+            awesome.Pomodoro.time:  716
+            awesome.Pomodoro.started:  0
+            XTerm*faceName: consolas
+            xterm*.background:      grey5
+            ]]
+        end
+        pomodoro:init()
+        assert.spy(s).was_not_called()
+        assert.are.equal(716, pomodoro.left)
     end)
 end)
 

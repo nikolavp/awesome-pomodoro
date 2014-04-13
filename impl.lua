@@ -163,9 +163,10 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     end
 
     function pomodoro:init()
-        local resource_from_last_run = nil
+        local time_from_last_run = nil
         local xresources = awful.util.pread("xrdb -query")
-        resource_from_last_run = xresources:match('awesome.Pomodoro.time:%s+%d+')
+        time_from_last_run = xresources:match('awesome.Pomodoro.time:%s+%d+')
+        started_from_last_run = xresources:match('awesome.Pomodoro.started:%s+%w+')
 
         set_pomodoro_icon('gray')
 
@@ -176,7 +177,8 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
         awesome.connect_signal("exit", function(restarting)
             -- run this synchronously cause otherwise it is not saved properly -.-
             if restarting then
-                awful.util.pread('echo "awesome.Pomodoro.time: ' .. pomodoro.left .. '" | xrdb -merge')
+                started_as_number = pomodoro.timer.started and 1 or 0
+                awful.util.pread('echo "awesome.Pomodoro.time: ' .. pomodoro.left .. '\nawesome.Pomodoro.started: ' .. started_as_number .. '" | xrdb -merge')
             end
         end)
 
@@ -200,9 +202,14 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
             end,
         })
 
-        if resource_from_last_run then
-            pomodoro.left = tonumber(resource_from_last_run:match('%d+'))
-            pomodoro:start()
+        if time_from_last_run then
+            pomodoro.left = tonumber(time_from_last_run:match('%d+'))
+            if started_from_last_run then
+                started_from_last_run = tonumber(started_from_last_run:match('%d+'))
+                if started_from_last_run == 1 then
+                    pomodoro:start()
+                end
+            end
         else
             -- Initial value depends on the one set by the user
             pomodoro.left = pomodoro.work_duration
