@@ -33,7 +33,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
 
     last_icon_used = nil
 
-    function set_pomodoro_icon(icon_name) 
+    function set_pomodoro_icon(icon_name)
         local pomodoro_image_path = awful.util.getdir("config") .."/pomodoro/images/" .. icon_name .. ".png"
         if last_icon_used == pomodoro_image_path then
             return
@@ -218,4 +218,4 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     end
 
     return pomodoro
-end 
+end
