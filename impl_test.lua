@@ -186,13 +186,14 @@ end)
 
 describe('Should use the images properly', function()
     path_we_got = nil
+    local pomodoro = createPomodoro(wibox, awful, naughty, beautiful, timer, awesome)
     pomodoro.icon_widget.set_image = function(self, image_path) 
         path_we_got = image_path
     end
     pomodoro.working = true
 
     it('should set the default icon to gray by default', function()
-        pomodoro.init()
+        pomodoro:init()
         assert.are.equal('/home/cooluser/.config/awesome/pomodoro/images/gray.png', path_we_got)
     end)
 

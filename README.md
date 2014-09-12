@@ -1,5 +1,7 @@
 # Pomodoro Widget
 
+[![Build Status](https://travis-ci.org/nikolavp/awesome-pomodoro.svg?branch=master)](https://travis-ci.org/nikolavp/awesome-pomodoro)
+
 Here are some screenshots on what you'll get if you include this module:
 * <a href="http://imgur.com/ko2M5WQ"><img src="http://i.imgur.com/ko2M5WQ.png" title="Hosted by imgur.com"/></a>
 * <a href="http://imgur.com/j30ZilX"><img src="http://i.imgur.com/j30ZilX.png" title="Hosted by imgur.com" /></a>
