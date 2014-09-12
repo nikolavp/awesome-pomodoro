@@ -5,6 +5,7 @@ local ipairs    = ipairs
 local setmetatable = setmetatable
 local print     = print
 local tonumber = tonumber
+local math = require("math")
 
 module("pomodoro.impl")
 
@@ -33,7 +34,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
 
     last_icon_used = nil
 
-    function set_pomodoro_icon(icon_name) 
+    function set_pomodoro_icon(icon_name)
         local pomodoro_image_path = awful.util.getdir("config") .."/pomodoro/images/" .. icon_name .. ".png"
         if last_icon_used == pomodoro_image_path then
             return
@@ -163,9 +164,10 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     end
 
     function pomodoro:init()
-        local resource_from_last_run = nil
         local xresources = awful.util.pread("xrdb -query")
-        resource_from_last_run = xresources:match('awesome.Pomodoro.time:%s+%d+')
+        local time_from_last_run = xresources:match('awesome.Pomodoro.time:%s+%d+')
+        local started_from_last_run = xresources:match('awesome.Pomodoro.started:%s+%w+')
+        local working_from_last_run = xresources:match('awesome.Pomodoro.working:%s+%w+')
 
         set_pomodoro_icon('gray')
 
@@ -174,15 +176,44 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
         pomodoro.timer:connect_signal("timeout", pomodoro.ticking)
 
         awesome.connect_signal("exit", function(restarting)
+            -- Save current state in xrdb.
             -- run this synchronously cause otherwise it is not saved properly -.-
             if restarting then
-                awful.util.pread('echo "awesome.Pomodoro.time: ' .. pomodoro.left .. '" | xrdb -merge')
+                started_as_number = pomodoro.timer.started and 1 or 0
+                working_as_number = pomodoro.working and 1 or 0
+                awful.util.pread('echo "awesome.Pomodoro.time: ' .. pomodoro.left
+                    .. '\nawesome.Pomodoro.started: ' .. started_as_number
+                    .. '\nawesome.Pomodoro.working: ' .. working_as_number
+                    .. '" | xrdb -merge')
             end
         end)
 
-        pomodoro:settime(pomodoro.work_duration)
         pomodoro.widget:buttons(get_buttons())
         pomodoro.icon_widget:buttons(get_buttons())
+
+        if time_from_last_run then
+            time_from_last_run = tonumber(time_from_last_run:match('%d+'))
+            if working_from_last_run then
+                pomodoro.working = (tonumber(working_from_last_run:match('%d+')) == 1)
+            end
+            -- Use `math.min` to get the lower value for `pomodoro.left`, in
+            -- case the config/setting has been changed.
+            if pomodoro.working then
+                pomodoro.left = math.min(time_from_last_run, pomodoro.work_duration)
+            else
+                pomodoro.left = math.min(time_from_last_run, pomodoro.pause_duration)
+            end
+            if started_from_last_run then
+                started_from_last_run = tonumber(started_from_last_run:match('%d+'))
+                if started_from_last_run == 1 then
+                    pomodoro:start()
+                end
+            end
+        else
+            -- Initial value depends on the one set by the user
+            pomodoro.left = pomodoro.work_duration
+        end
+        pomodoro:settime(pomodoro.left)
 
         awful.tooltip({
             objects = { pomodoro.widget, pomodoro.icon_widget},
@@ -200,15 +231,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
             end,
         })
 
-        if resource_from_last_run then
-            pomodoro.left = tonumber(resource_from_last_run:match('%d+'))
-            pomodoro:start()
-        else
-            -- Initial value depends on the one set by the user
-            pomodoro.left = pomodoro.work_duration
-        end
-
     end
 
     return pomodoro
-end 
+end
