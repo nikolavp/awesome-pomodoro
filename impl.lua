@@ -13,8 +13,11 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     -- pomodoro timer widget
     pomodoro = {}
     -- tweak these values in seconds to your liking
-    pomodoro.pause_duration = 5 * 60
+    pomodoro.short_pause_duration = 5 * 60
+    pomodoro.long_pause_duration = 15 * 60
     pomodoro.work_duration = 25 * 60
+    pomodoro.npomodoros = 0
+    pomodoro.pause_duration = pomodoro.short_pause_duration
     pomodoro.change = 60
 
 
@@ -139,6 +142,12 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
         else
             set_pomodoro_icon('gray')
             if pomodoro.working then
+                pomodoro.npomodoros = pomodoro.npomodoros + 1
+                if pomodoro.npomodoros % 4 == 0 then
+                    pomodoro.pause_duration = pomodoro.long_pause_duration
+                else
+                    pomodoro.pause_duration = pomodoro.short_pause_duration
+                end
                 pomodoro:notify(pomodoro.work_title, pomodoro.work_text,
                 pomodoro.pause_duration, false)
                 for _, value in ipairs(pomodoro.on_work_pomodoro_finish_callbacks) do
@@ -168,6 +177,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
         local time_from_last_run = xresources:match('awesome.Pomodoro.time:%s+%d+')
         local started_from_last_run = xresources:match('awesome.Pomodoro.started:%s+%w+')
         local working_from_last_run = xresources:match('awesome.Pomodoro.working:%s+%w+')
+        local npomodoros_from_last_run = xresources:match('awesome.Pomodoro.npomodoros:%s+%d+')
 
         set_pomodoro_icon('gray')
 
@@ -182,9 +192,10 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
                 started_as_number = pomodoro.timer.started and 1 or 0
                 working_as_number = pomodoro.working and 1 or 0
                 awful.util.pread('echo "awesome.Pomodoro.time: ' .. pomodoro.left
-                    .. '\nawesome.Pomodoro.started: ' .. started_as_number
-                    .. '\nawesome.Pomodoro.working: ' .. working_as_number
-                    .. '" | xrdb -merge')
+                .. '\nawesome.Pomodoro.started: ' .. started_as_number
+                .. '\nawesome.Pomodoro.working: ' .. working_as_number
+                .. '\nawesome.Pomodoro.npomodoros: ' .. pomodoro.npomodoros
+                .. '" | xrdb -merge')
             end
         end)
 
@@ -203,6 +214,11 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
             else
                 pomodoro.left = math.min(time_from_last_run, pomodoro.pause_duration)
             end
+
+            if npomodoros_from_last_run then
+                pomodoro.npomodoros = tonumber(npomodoros_from_last_run:match('%d+'))
+            end
+
             if started_from_last_run then
                 started_from_last_run = tonumber(started_from_last_run:match('%d+'))
                 if started_from_last_run == 1 then
@@ -219,13 +235,14 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
             objects = { pomodoro.widget, pomodoro.icon_widget},
             timer_function = function()
                 if pomodoro.timer.started then
+                    local collected = 'Collected ' .. pomodoro.npomodoros .. ' pomodoros so far.\n'
                     if pomodoro.working then
-                        return 'Work ending in ' .. os.date("%M:%S", pomodoro.left)
+                        return collected .. 'Work ending in ' .. os.date("%M:%S", pomodoro.left)
                     else
-                        return 'Rest ending in ' .. os.date("%M:%S", pomodoro.left)
+                        return collected .. 'Rest ending in ' .. os.date("%M:%S", pomodoro.left)
                     end
                 else
-                    return 'Pomodoro not started'
+                    return collected .. 'Pomodoro not started'
                 end
                 return 'Bad tooltip'
             end,

@@ -243,3 +243,18 @@ describe('Should use the images properly', function()
     end)
 end)
 
+
+describe('Long breaks', function()
+
+    local pomodoro = createPomodoro(wibox, awful, naughty, beautiful, timer, awesome)
+    it('should properly start a long break after 4 full pomodoros', function()
+        for i=1,4,1 do
+            pomodoro.working = true
+            pomodoro.left = 0
+            assert.are.not_equal(15 * 60, pomodoro.pause_duration)
+            pomodoro:ticking_time()
+        end
+        assert.are.equal(15 * 60, pomodoro.pause_duration)
+    end)
+end)
+
