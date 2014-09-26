@@ -234,8 +234,8 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
         awful.tooltip({
             objects = { pomodoro.widget, pomodoro.icon_widget},
             timer_function = function()
+                local collected = 'Collected ' .. pomodoro.npomodoros .. ' pomodoros so far.\n'
                 if pomodoro.timer.started then
-                    local collected = 'Collected ' .. pomodoro.npomodoros .. ' pomodoros so far.\n'
                     if pomodoro.working then
                         return collected .. 'Work ending in ' .. os.date("%M:%S", pomodoro.left)
                     else
