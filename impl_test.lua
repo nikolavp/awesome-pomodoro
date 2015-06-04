@@ -189,6 +189,7 @@ end)
 describe('Should use the images properly', function()
     path_we_got = nil
     local pomodoro = createPomodoro(wibox, awful, naughty, beautiful, timer, awesome)
+    pomodoro.module_path = "pomodoro/"
     pomodoro.icon_widget.set_image = function(self, image_path) 
         path_we_got = image_path
     end

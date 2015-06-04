@@ -1,3 +1,5 @@
+local module_path = (...):match ("(.+/)[^/]+$") or ""
+
 local image     = image
 local os        = os
 local string    = string
@@ -19,6 +21,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     pomodoro.npomodoros = 0
     pomodoro.pause_duration = pomodoro.short_pause_duration
     pomodoro.change = 60
+    pomodoro.module_path = module_path
 
 
     pomodoro.format = function (t) return "Pomodoro: <b>" .. t .. "</b>" end
@@ -38,7 +41,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     last_icon_used = nil
 
     function set_pomodoro_icon(icon_name)
-        local pomodoro_image_path = awful.util.getdir("config") .."/pomodoro/images/" .. icon_name .. ".png"
+        local pomodoro_image_path = awful.util.getdir("config") .. "/" .. pomodoro.module_path .. "images/" .. icon_name .. ".png"
         if last_icon_used == pomodoro_image_path then
             return
         end
