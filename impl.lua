@@ -71,7 +71,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
 
     function pomodoro:start()
         pomodoro.last_time = os.time()
-        pomodoro.timer:start()
+        pomodoro.timer:again()
     end
 
     function pomodoro:pause()

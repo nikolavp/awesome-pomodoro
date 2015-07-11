@@ -35,7 +35,7 @@ local beautiful = {}
 
 local timer = function(t) 
     return {
-        start = function(self) return nil end,
+        again = function(self, f) return nil end,
         stop = function(self) return nil end,
         connect_signal = function(self, f) return nil end,
     }
@@ -93,7 +93,7 @@ end)
 
 describe('Starting a pomodoro', function()
     it('should start the timer', function()
-        local s = spy.on(pomodoro.timer, 'start')
+        local s = spy.on(pomodoro.timer, 'again')
         pomodoro:start()
         assert.spy(s).was_called_with(pomodoro.timer)
     end)
