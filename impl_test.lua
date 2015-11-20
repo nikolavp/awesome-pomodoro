@@ -2,7 +2,7 @@ local createPomodoro = require('impl')
 
 local wibox = {
     widget = {
-        textbox = function() 
+        textbox = function()
             return {
                 set_markup = function(self, s) return nil end,
                 buttons = function(self, bs) return nil end,
@@ -33,7 +33,7 @@ local naughty = {
 }
 local beautiful = {}
 
-local timer = function(t) 
+local timer = function(t)
     return {
         again = function(self, f) return nil end,
         stop = function(self) return nil end,
@@ -65,12 +65,14 @@ end)
 
 describe('Set time should change the textbox appropriately', function()
     local s = spy.on(pomodoro.widget, "set_markup")
+    pomodoro.changed = true
     it('more than one hour pomodoro should be formatted with an hour part', function()
         pomodoro:settime(3601)
         assert.spy(s).was_called_with(pomodoro.widget, "Pomodoro: <b>01:00:01</b>")
     end)
     it('less than one hour should be set with only minutes and seconds', function()
         pomodoro:settime(1500)
+	for k, v in ipairs(pomodoro.widget) do print(k, v) end
         assert.spy(s).was_called_with(pomodoro.widget, "Pomodoro: <b>25:00</b>")
     end)
 end)
@@ -187,7 +189,7 @@ end)
 describe('Should use the images properly', function()
     path_we_got = nil
     local pomodoro = createPomodoro(wibox, awful, naughty, beautiful, timer, awesome)
-    pomodoro.icon_widget.set_image = function(self, image_path) 
+    pomodoro.icon_widget.set_image = function(self, image_path)
         path_we_got = image_path
     end
     pomodoro.working = true
