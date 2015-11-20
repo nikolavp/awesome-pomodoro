@@ -65,6 +65,7 @@ end)
 
 describe('Set time should change the textbox appropriately', function()
     local s = spy.on(pomodoro.widget, "set_markup")
+    pomodoro.changed = true
     it('more than one hour pomodoro should be formatted with an hour part', function()
         pomodoro:settime(3601)
         assert.spy(s).was_called_with(pomodoro.widget, "Pomodoro: <b>01:00:01</b>")
