@@ -108,6 +108,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
         pomodoro:settime(pomodoro.work_duration+pomodoro.change)
         pomodoro.work_duration = pomodoro.work_duration+pomodoro.change
         pomodoro.left = pomodoro.work_duration
+        pomodoro.changed_timer:again()
         pomodoro.changed_timer:start()
     end
 
@@ -119,6 +120,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
             pomodoro.work_duration = pomodoro.work_duration-pomodoro.change
             pomodoro.left = pomodoro.work_duration
         end
+        pomodoro.changed_timer:again()
         pomodoro.changed_timer:start()
     end
 
