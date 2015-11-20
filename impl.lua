@@ -32,7 +32,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
 
     pomodoro.format = function (t)
         if pomodoro.changed or pomodoro.timer.started then
-            return string.format("<b>%s</b>", t)
+            return string.format("Pomodoro: <b>%s</b>", t)
         else return ""
         end
     end
