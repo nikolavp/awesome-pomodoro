@@ -18,10 +18,24 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     pomodoro.work_duration = 25 * 60
     pomodoro.npomodoros = 0
     pomodoro.pause_duration = pomodoro.short_pause_duration
+
     pomodoro.change = 60
+    pomodoro.changed = false
+    pomodoro.changed_timer = timer({timeout = 3})
+    pomodoro.changed_timer:connect_signal("timeout", function ()
+        pomodoro.changed=false
+        pomodoro.changed_timer:again()
+        pomodoro.changed_timer:stop()
+        pomodoro.widget:set_text(pomodoro.format(pomodoro.work_duration))
+    end)
 
 
-    pomodoro.format = function (t) return "Pomodoro: <b>" .. t .. "</b>" end
+    pomodoro.format = function (t)
+        if pomodoro.changed or pomodoro.timer.started then
+            return string.format("Pomodoro: <b>%s</b>", t)
+        else return ""
+        end
+    end
     pomodoro.pause_title = "Pause finished."
     pomodoro.pause_text = "Get back to work!"
     pomodoro.work_title = "Pomodoro finished."
@@ -89,19 +103,25 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     end
 
     function pomodoro:increase_time()
+        pomodoro.changed = true
         pomodoro.timer:stop()
         pomodoro:settime(pomodoro.work_duration+pomodoro.change)
         pomodoro.work_duration = pomodoro.work_duration+pomodoro.change
         pomodoro.left = pomodoro.work_duration
+        pomodoro.changed_timer:again()
+        pomodoro.changed_timer:start()
     end
 
     function pomodoro:decrease_time()
+        pomodoro.changed = true
         pomodoro.timer:stop()
         if pomodoro.work_duration > pomodoro.change then
             pomodoro:settime(pomodoro.work_duration-pomodoro.change)
             pomodoro.work_duration = pomodoro.work_duration-pomodoro.change
             pomodoro.left = pomodoro.work_duration
         end
+        pomodoro.changed_timer:again()
+        pomodoro.changed_timer:start()
     end
 
     function get_buttons()
