@@ -11,9 +11,9 @@ local math = require("math")
 
 module("pomodoro.impl")
 
-return function(wibox, awful, naughty, beautiful, timer, awesome)
+return function(wibox, awful, naughty, beautiful, timer, awesome, base)
     -- pomodoro timer widget
-    pomodoro = {}
+    pomodoro = wibox.widget.base.make_widget()
     -- tweak these values in seconds to your liking
     pomodoro.short_pause_duration = 5 * 60
     pomodoro.long_pause_duration = 15 * 60
@@ -75,6 +75,11 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     function pomodoro:start()
         pomodoro.last_time = os.time()
         pomodoro.timer:again()
+        if pomodoro.working then
+            self:emit_signal("start_working")
+        else
+            self:emit_signal("start_pause")
+        end
     end
 
     function pomodoro:pause()
@@ -151,6 +156,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
                 else
                     pomodoro.pause_duration = pomodoro.short_pause_duration
                 end
+                self:emit_signal("stop_working")
                 pomodoro:notify(pomodoro.work_title, pomodoro.work_text,
                 pomodoro.pause_duration, false)
                 for _, value in ipairs(pomodoro.on_work_pomodoro_finish_callbacks) do
@@ -159,6 +165,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
             else
                 pomodoro:notify(pomodoro.pause_title, pomodoro.pause_text,
                 pomodoro.work_duration, true)
+                self:emit_signal("stop_pause")
                 for _, value in ipairs(pomodoro.on_pause_pomodoro_finish_callbacks) do
                     value()
                 end

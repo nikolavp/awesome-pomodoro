@@ -13,7 +13,14 @@ local wibox = {
                 set_image = function(self, image_path) return nil end,
                 buttons = function(self, bs) return nil end,
             }
-        end
+        end,
+        base = {
+            make_widget = function()
+                return {
+                    emit_signal = function(self, s) return nil end
+                }
+            end
+        }
     }
 }
 local awful = {
