@@ -238,9 +238,9 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
                 local collected = 'Collected ' .. pomodoro.npomodoros .. ' pomodoros so far.\n'
                 if pomodoro.timer.started then
                     if pomodoro.working then
-                        return collected .. 'Work ending in ' .. os.date("%M:%S", pomodoro.left)
+                        return collected .. 'Work ending in ' .. os.date("%!M:%S", pomodoro.left)
                     else
-                        return collected .. 'Rest ending in ' .. os.date("%M:%S", pomodoro.left)
+                        return collected .. 'Rest ending in ' .. os.date("%!M:%S", pomodoro.left)
                     end
                 else
                     return collected .. 'Pomodoro not started'
