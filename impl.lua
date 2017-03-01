@@ -15,7 +15,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
     -- tweak these values in seconds to your liking
     pomodoro.short_pause_duration = 5 * 60
     pomodoro.long_pause_duration = 15 * 60
-    pomodoro.work_duration = 25 * 60
+    pomodoro.work_duration = 15 * 60
     pomodoro.npomodoros = 0
     pomodoro.pause_duration = pomodoro.short_pause_duration
     pomodoro.change = 60
@@ -50,7 +50,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
         if t >= 3600 then -- more than one hour!
             t = os.date("!%X", t)
         else
-            t = os.date("%M:%S", t)
+            t = os.date("!%M:%S", t)
         end
         self.widget:set_markup(pomodoro.format(t))
     end
@@ -238,9 +238,9 @@ return function(wibox, awful, naughty, beautiful, timer, awesome)
                 local collected = 'Collected ' .. pomodoro.npomodoros .. ' pomodoros so far.\n'
                 if pomodoro.timer.started then
                     if pomodoro.working then
-                        return collected .. 'Work ending in ' .. os.date("%!M:%S", pomodoro.left)
+                        return collected .. 'Work ending in ' .. os.date("!%M:%S", pomodoro.left)
                     else
-                        return collected .. 'Rest ending in ' .. os.date("%!M:%S", pomodoro.left)
+                        return collected .. 'Rest ending in ' .. os.date("!%M:%S", pomodoro.left)
                     end
                 else
                     return collected .. 'Pomodoro not started'
