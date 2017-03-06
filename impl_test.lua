@@ -13,7 +13,14 @@ local wibox = {
                 set_image = function(self, image_path) return nil end,
                 buttons = function(self, bs) return nil end,
             }
-        end
+        end,
+        base = {
+            make_widget = function()
+                return {
+                    emit_signal = function(self, s) return nil end
+                }
+            end
+        }
     }
 }
 local awful = {
@@ -189,6 +196,7 @@ end)
 describe('Should use the images properly', function()
     path_we_got = nil
     local pomodoro = createPomodoro(wibox, awful, naughty, beautiful, timer, awesome)
+    pomodoro.module_path = "pomodoro/"
     pomodoro.icon_widget.set_image = function(self, image_path) 
         path_we_got = image_path
     end
