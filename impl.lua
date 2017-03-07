@@ -15,19 +15,19 @@ return function(wibox, awful, naughty, beautiful, timer, awesome, base)
     -- pomodoro timer widget
     pomodoro = wibox.widget.base.make_widget()
     -- tweak these values in seconds to your liking
-    pomodoro.short_pause_duration = 5 * 60
-    pomodoro.long_pause_duration = 15 * 60
-    pomodoro.work_duration = 25 * 60
+    pomodoro.short_pause_duration = 5.5 * 60
+    pomodoro.long_pause_duration = 14 * 60
+    pomodoro.work_duration = 24 * 60
     pomodoro.npomodoros = 0
     pomodoro.pause_duration = pomodoro.short_pause_duration
     pomodoro.change = 60
     pomodoro.module_path = module_path
 
 
-    pomodoro.format = function (t) return "Pomodoro: <b>" .. t .. "</b>" end
+    pomodoro.format = function (t) return "Current Slot: <b>" .. t .. "</b>" end
     pomodoro.pause_title = "Pause finished."
     pomodoro.pause_text = "Get back to work!"
-    pomodoro.work_title = "Pomodoro finished."
+    pomodoro.work_title = "Slot finished."
     pomodoro.work_text = "Time for a pause!"
     pomodoro.working = true
     pomodoro.widget = wibox.widget.textbox()
@@ -53,7 +53,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome, base)
         if t >= 3600 then -- more than one hour!
             t = os.date("!%X", t)
         else
-            t = os.date("%M:%S", t)
+            t = os.date("!%M:%S", t)
         end
         self.widget:set_markup(pomodoro.format(t))
     end
@@ -151,7 +151,7 @@ return function(wibox, awful, naughty, beautiful, timer, awesome, base)
             set_pomodoro_icon('gray')
             if pomodoro.working then
                 pomodoro.npomodoros = pomodoro.npomodoros + 1
-                if pomodoro.npomodoros % 4 == 0 then
+                if pomodoro.npomodoros % 3 == 0 then
                     pomodoro.pause_duration = pomodoro.long_pause_duration
                 else
                     pomodoro.pause_duration = pomodoro.short_pause_duration
@@ -245,15 +245,15 @@ return function(wibox, awful, naughty, beautiful, timer, awesome, base)
         awful.tooltip({
             objects = { pomodoro.widget, pomodoro.icon_widget},
             timer_function = function()
-                local collected = 'Collected ' .. pomodoro.npomodoros .. ' pomodoros so far.\n'
+                local collected = 'Worked for ' .. pomodoro.npomodoros .. ' slots so far.\n'
                 if pomodoro.timer.started then
                     if pomodoro.working then
-                        return collected .. 'Work ending in ' .. os.date("%M:%S", pomodoro.left)
+                        return collected .. 'Work ending in ' .. os.date("!%M:%S", pomodoro.left)
                     else
-                        return collected .. 'Rest ending in ' .. os.date("%M:%S", pomodoro.left)
+                        return collected .. 'Rest ending in ' .. os.date("!%M:%S", pomodoro.left)
                     end
                 else
-                    return collected .. 'Pomodoro not started'
+                    return collected .. 'Slot not started'
                 end
                 return 'Bad tooltip'
             end,
