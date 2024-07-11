@@ -18,7 +18,7 @@ more can be found in our [screenshots wiki page](https://github.com/nikolavp/awe
 ### In you rc.lua:
 
     // insert after beautiful.init("...")
-    local pomodoro = require("pomodoro")
+    local pomodoro = require("./pomodoro/init")
 
     //init the pomodoro object
     pomodoro.init()
